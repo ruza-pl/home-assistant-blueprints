@@ -39,25 +39,9 @@ variables:
   trv_calibration_number: !input trv_calibration_number
   temperature_sensor: !input temperature_sensor                                
 
-trigger:
-  - platform: state
-    entity_id: !input trv
-    for:
-      hours: 0
-      minutes: 0
-      seconds: 0
-  - platform: state
-    entity_id: !input trv_calibration_number
-    for:
-      hours: 0
-      minutes: 0
-      seconds: 0
-  - platform: state
-    entity_id: !input temperature_sensor
-    for:
-      hours: 0
-      minutes: 0
-      seconds: 0
+triggers:
+  - trigger: time_pattern
+    minutes: /3
 
 condition:
   - condition: template
