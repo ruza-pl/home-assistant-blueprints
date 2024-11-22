@@ -53,7 +53,7 @@ action:
             {% set trv_temperature = state_attr(trv, "current_temperature") %}
 
             {% set trv_calibration = states(trv_calibration_number) | float %}    
-            {% set new_trv_calibration = room_temperature - trv_temperature %}
+            {% set new_trv_calibration = (room_temperature - trv_temperature) | float %}
             {% set new_trv_calibration = trv_calibration + new_trv_calibration %} 
 
        #    {% set new_trv_calibration_bounded = [ [ (new_trv_calibration - new_trv_calibration % trv_calibration_step) | round(trv_calibration_step_decimals), trv_calibration_min ] | max, trv_calibration_max ] | min %}
