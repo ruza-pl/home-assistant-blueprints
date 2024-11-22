@@ -1,0 +1,58 @@
+blueprint:
+  name: TRV Calibrator - interał 3 minutowy
+  description: Kalibracja Głowicy w interwale 3 minutowym na podstawie zewnętrznego czujnika
+  domain: automation
+  input:
+    trv:
+      name: Głowica TRV
+      selector:
+        entity:
+          domain: climate
+    temperature_sensor:
+      name: Czujnik Temperatury
+      description: Czujnik do ustawiania temperatury na głowicy
+      selector:
+        entity:
+          domain: sensor
+          device_class: temperature
+    trv_calibration_number:
+      name: Encja kalibracji temperatury
+      description: Wybierz encję kalibracji głowicy
+      selector:
+        entity:
+          domain: number
+#          device_class: temperature
+
+
+mode: restart
+
+variables:
+  trv: !input trv
+  trv_calibration_number: !input trv_calibration_number
+  temperature_sensor: !input temperature_sensor                                
+
+triggers:
+  - trigger: time_pattern
+    minutes: /3
+
+condition:
+  - condition: template
+    value_template: '{{ state_attr(trv, "current_temperature") != None }}'
+  - condition: template
+    value_template: '{{ states(trv_calibration_number) != "unavailable" and states(trv_calibration_number) != "unknown" }}'
+  - condition: template
+    value_template: '{{ states(temperature_sensor) != "unavailable" and states(temperature_sensor) != "unknown" }}'
+
+action:
+  - service: number.set_value
+    target:
+      entity_id: !input trv_calibration_number
+    data:
+      value: >- 
+            {% set room_temperature = states(temperature_sensor) | float %}
+            {% set trv_temperature = state_attr(trv, "current_temperature") %}
+
+            {% set trv_calibration = states(trv_calibration_number) | float %}    
+            {% set new_trv_calibration = (room_temperature - trv_temperature) | float %}
+            {% set new_trv_calibration = trv_calibration + new_trv_calibration %} 
+            {{ new_trv_calibration }}
