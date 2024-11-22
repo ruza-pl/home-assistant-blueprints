@@ -1,23 +1,23 @@
 blueprint:
-  name: TRV Calibrator 5 minutes
-  description: Calibrate your TRV using an external sensor
+  name: TRV Calibrator - interał 3 minutowy
+  description: Kalibracja Głowicy w interwale 3 minutowym na podstawie zewnętrznego czujnika
   domain: automation
   input:
     trv:
-      name: Smart TRV
+      name: Głowica TRV
       selector:
         entity:
           domain: climate
     temperature_sensor:
-      name: Temperature Sensor
-      description: Sensor used to calibrate your TRV
+      name: Czujnik Temperatury
+      description: Czujnik do ustawiania temperatury na głowicy
       selector:
         entity:
           domain: sensor
           device_class: temperature
     trv_calibration_number:
-      name: TRV Calibration Entity
-      description: If you can't find it it's possible that your TRV don't support calibration. Consider using the Better Thermostat custom integration instead.
+      name: Encja kalibracji temperatury
+      description: Wybierz encję kalibracji głowicy
       selector:
         entity:
           domain: number
@@ -53,24 +53,16 @@ action:
             {% set trv_temperature = state_attr(trv, "current_temperature") | float(0) %}
 
             {% set trv_calibration = states(trv_calibration_number) | float %}
-            {% set trv_calibration_min = state_attr(trv_calibration_number, "min") | float(-5) %}
-            {% set trv_calibration_max = state_attr(trv_calibration_number, "max") | float(5) %}
-            {% set trv_calibration_step = state_attr(trv_calibration_number, "step") | float(1) %}
-
-            {% set step = trv_calibration_step | string %}
+      #      {% set trv_calibration_min = state_attr(trv_calibration_number, "min") | float(-5) %}
+      #      {% set trv_calibration_max = state_attr(trv_calibration_number, "max") | float(5) %}
+      #     {% set trv_calibration_step = state_attr(trv_calibration_number, "step") | float(1) %}
             
-            {% if step.split(".") | length > 1 -%}
-              {% set trv_calibration_step_decimals = step.split(".")[1] | length %}
-            {%- else -%}
-              {% set trv_calibration_step_decimals = 0 %}
-            {%- endif %}
+            {% set new_trv_calibration = room_temperature - trv_temperature %}
+            {% new_trv_calibration = trv_calibration + new_trv_calibration %} 
+       #    {% set new_trv_calibration_bounded = [ [ (new_trv_calibration - new_trv_calibration % trv_calibration_step) | round(trv_calibration_step_decimals), trv_calibration_min ] | max, trv_calibration_max ] | min %}
 
-            
-            {% set new_trv_calibration = room_temperature - trv_temperature + trv_calibration %}
-            {% set new_trv_calibration_bounded = [ [ (new_trv_calibration - new_trv_calibration % trv_calibration_step) | round(trv_calibration_step_decimals), trv_calibration_min ] | max, trv_calibration_max ] | min %}
-
-            {% if new_trv_calibration_bounded < trv_calibration - trv_calibration_step or trv_calibration + trv_calibration_step < new_trv_calibration_bounded -%}
-              {{ new_trv_calibration_bounded }}
+            {% if new_trv_calibration != trv_calibration %}
+              {{ new_trv_calibration }}
             {%- else -%}
               {{ states(trv_calibration_number) }}
             {%- endif %}
