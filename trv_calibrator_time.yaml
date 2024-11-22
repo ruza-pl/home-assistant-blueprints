@@ -1,5 +1,5 @@
 blueprint:
-  name: TRV Calibrator
+  name: TRV Calibrator 5 minutes
   description: Calibrate your TRV using an external sensor
   domain: automation
   input:
