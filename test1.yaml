@@ -52,7 +52,7 @@ action:
             {% set room_temperature = states(temperature_sensor) | float (0) %}
             {% set trv_temperature = state_attr(trv, "current_temperature") |float (0) %}
 
-            {% set trv_calibration = states(trv_calibration_number) | float  (0) %}    
+            {% set trv_calibration = states(trv_calibration_number) * 10 | float  (0) %}    
             {% set new_trv_calibration = (room_temperature - trv_temperature) | float (0) %}
             {% set new_trv_calibration = trv_calibration + new_trv_calibration | float (0) %} 
-            {{ new_trv_calibration | round (0) }}
+            {{ new_trv_calibration / 10 | round (1) }}
