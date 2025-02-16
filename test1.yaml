@@ -1,5 +1,5 @@
 blueprint:
-  name: TRV Calibrator - interał 3 minutowy
+  name: TRV Calibrator - interał 3 minutowy, kalibracja 0.1 stopnia
   description: Kalibracja Głowicy w interwale 3 minutowym na podstawie zewnętrznego czujnika
   domain: automation
   input:
